@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Padoquinha · Painel de Produtos</title>
+<style>
+  :root{--marrom:#492510;--marrom2:#5E351A;--marrom3:#3A1D0C;--ouro:#C79A4E;--ouro-d:#A87F38;
+        --creme:#F2E8D5;--fundo:#FBF6EC;--tinta:#3A2415;--tinta2:#8A745C;--linha:#E6D9C2;--branco:#fff;
+        --ok:#2f8f5b;--erro:#c0392b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--fundo);color:var(--tinta);line-height:1.5}
+  .top{background:var(--marrom);color:var(--creme);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+  .top b{font-size:17px;letter-spacing:.02em}
+  .top .sair{background:rgba(255,255,255,.14);color:#fff;border:0;padding:8px 14px;border-radius:100px;font-weight:700;cursor:pointer;font-size:13px}
+  .wrap{max-width:640px;margin:0 auto;padding:18px}
+  .card{background:var(--branco);border:1px solid var(--linha);border-radius:16px;padding:20px;box-shadow:0 6px 20px rgba(73,37,16,.06);margin-bottom:16px}
+  h2{font-size:19px;color:var(--marrom);margin-bottom:14px}
+  label{display:block;font-size:13px;font-weight:700;color:var(--tinta2);margin:12px 0 5px}
+  input,textarea,select{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:11px;font-size:15px;font-family:inherit;background:#fff;color:var(--tinta)}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--ouro)}
+  textarea{min-height:80px;resize:vertical}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--marrom);color:#fff;border:0;padding:13px 18px;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer;width:100%;margin-top:16px}
+  .btn:active{transform:translateY(1px)}
+  .btn--ouro{background:var(--ouro);color:var(--marrom)}
+  .btn--sec{background:#fff;color:var(--marrom);border:1.5px solid var(--linha);margin-top:8px}
+  .btn--peq{width:auto;padding:8px 12px;font-size:13px;margin:0}
+  .aviso{padding:11px 14px;border-radius:10px;font-size:14px;font-weight:600;margin-top:12px;display:none}
+  .aviso.ok{background:#e6f6ee;color:var(--ok);display:block}
+  .aviso.erro{background:#fdecea;color:var(--erro);display:block}
+  .foto-prev{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:11px;border:1.5px solid var(--linha);margin-top:8px;background:var(--creme);display:none}
+  .lista-item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--linha)}
+  .lista-item:last-child{border-bottom:0}
+  .lista-item img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--creme);flex-shrink:0}
+  .lista-item .info{flex:1;min-width:0}
+  .lista-item .info b{display:block;font-size:15px;color:var(--marrom);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lista-item .info small{color:var(--tinta2);font-size:12.5px}
+  .lista-item .acoes{display:flex;gap:6px;flex-shrink:0}
+  .tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:100px;background:rgba(199,154,78,.16);color:var(--ouro-d)}
+  .tag.off{background:#eee;color:#999}
+  .ic{background:#fff;border:1.5px solid var(--linha);border-radius:9px;width:38px;height:38px;cursor:pointer;font-size:16px;color:var(--marrom)}
+  .ic.del{color:var(--erro);border-color:#f3c9c4}
+  .mut{color:var(--tinta2);font-size:13px;text-align:center;padding:16px}
+  .hide{display:none!important}
+  .spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:g .7s linear infinite}
+  @keyframes g{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <b>🥐 Padoquinha · Produtos</b>
+  <button class="sair hide" id="btnSair">Sair</button>
+</div>
+
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div class="card" id="telaLogin">
+    <h2>Entrar no painel</h2>
+    <label>E-mail</label>
+    <input type="email" id="email" placeholder="seu@email.com" autocomplete="username">
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+    <button class="btn" id="btnEntrar">Entrar</button>
+    <div class="aviso" id="avisoLogin"></div>
+  </div>
+
+  <!-- PAINEL -->
+  <div id="telaPainel" class="hide">
+
+    <!-- FORM -->
+    <div class="card">
+      <h2 id="formTitulo">Novo produto</h2>
+      <input type="hidden" id="pid">
+      <label>Nome</label>
+      <input type="text" id="f_nome" placeholder="Ex.: Coxinha de Frango">
+      <label>Categoria</label>
+      <select id="f_categoria">
+        <option>Salgados Assados</option>
+        <option>Salgados Fritos</option>
+        <option>Folhados e Semifolhados</option>
+        <option>Pães</option>
+        <option>Doces</option>
+      </select>
+      <label>Descrição</label>
+      <textarea id="f_descricao" placeholder="Uma frase curta e apetitosa sobre o produto."></textarea>
+      <label>Peso / Rendimento</label>
+      <input type="text" id="f_peso" placeholder="Ex.: 10 unidades | 1,2 kg">
+      <label>Características (uma por linha)</label>
+      <textarea id="f_caracteristicas" placeholder="Preparo: forno ou air fryer&#10;Conservar congelado entre -12°C e -18°C"></textarea>
+      <label>Foto do produto</label>
+      <input type="file" id="f_foto" accept="image/*">
+      <img class="foto-prev" id="fotoPrev">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:14px">
+        <input type="checkbox" id="f_publicado" checked style="width:auto"> Publicado (aparece no site)
+      </label>
+      <button class="btn" id="btnSalvar">Salvar produto</button>
+      <button class="btn btn--sec" id="btnLimpar">Limpar / novo</button>
+      <div class="aviso" id="avisoForm"></div>
+    </div>
+
+    <!-- LISTA -->
+    <div class="card">
+      <h2>Produtos cadastrados (<span id="qtd">0</span>)</h2>
+      <div id="lista"><p class="mut">Carregando…</p></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SB={url:'https://tbbdxyogrlfvinediqjg.supabase.co',key:'sb_publishable_IgahcMqYtvuSPpFQU-7mbA_w_BbSxYZ',bucket:'padoq-produtos'};
+let TOKEN=sessionStorage.getItem('padoq_tok')||'';
+
+const $=id=>document.getElementById(id);
+function aviso(el,msg,tipo){el.textContent=msg;el.className='aviso '+tipo;if(tipo==='ok')setTimeout(()=>el.className='aviso',3000);}
+function H(){return{apikey:SB.key,Authorization:'Bearer '+TOKEN};}
+
+/* ---- LOGIN ---- */
+$('btnEntrar').onclick=async()=>{
+  const email=$('email').value.trim(), senha=$('senha').value;
+  if(!email||!senha){aviso($('avisoLogin'),'Preencha e-mail e senha.','erro');return;}
+  $('btnEntrar').innerHTML='<span class="spin"></span>';
+  try{
+    const r=await fetch(SB.url+'/auth/v1/token?grant_type=password',{method:'POST',
+      headers:{apikey:SB.key,'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:senha})});
+    const d=await r.json();
+    if(!r.ok||!d.access_token){throw new Error(d.error_description||d.msg||'E-mail ou senha inválidos.');}
+    TOKEN=d.access_token; sessionStorage.setItem('padoq_tok',TOKEN);
+    entrar();
+  }catch(e){aviso($('avisoLogin'),e.message,'erro');}
+  $('btnEntrar').textContent='Entrar';
+};
+$('btnSair').onclick=()=>{sessionStorage.removeItem('padoq_tok');TOKEN='';location.reload();};
+
+function entrar(){$('telaLogin').classList.add('hide');$('telaPainel').classList.remove('hide');$('btnSair').classList.remove('hide');carregar();}
+
+/* ---- PREVIEW FOTO ---- */
+$('f_foto').onchange=e=>{const f=e.target.files[0];if(!f)return;const u=URL.createObjectURL(f);$('fotoPrev').src=u;$('fotoPrev').style.display='block';};
+
+/* redimensiona no navegador antes de subir */
+function resize(file,max){return new Promise((res,rej)=>{
+  const img=new Image();img.onload=()=>{
+    let{width:w,height:h}=img;
+    if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    c.toBlob(b=>b?res(b):rej(new Error('Falha ao processar imagem')),'image/webp',0.82);
+  };img.onerror=()=>rej(new Error('Imagem inválida'));img.src=URL.createObjectURL(file);
+});}
+
+async function subirFoto(file){
+  const blob=await resize(file,900);
+  const nome='prod-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.webp';
+  const r=await fetch(SB.url+'/storage/v1/object/'+SB.bucket+'/'+nome,{method:'POST',
+    headers:{...H(),'Content-Type':'image/webp'},body:blob});
+  if(!r.ok){const t=await r.text();throw new Error('Erro ao subir foto: '+t);}
+  return SB.url+'/storage/v1/object/public/'+SB.bucket+'/'+nome;
+}
+
+/* ---- SALVAR ---- */
+$('btnSalvar').onclick=async()=>{
+  const nome=$('f_nome').value.trim();
+  if(!nome){aviso($('avisoForm'),'Informe o nome do produto.','erro');return;}
+  $('btnSalvar').innerHTML='<span class="spin"></span>';
+  try{
+    let imagem_url=null;
+    const arq=$('f_foto').files[0];
+    if(arq) imagem_url=await subirFoto(arq);
+    const corpo={
+      nome, categoria:$('f_categoria').value,
+      descricao:$('f_descricao').value.trim(),
+      caracteristicas:$('f_caracteristicas').value.trim(),
+      peso:$('f_peso').value.trim(),
+      publicado:$('f_publicado').checked
+    };
+    if(imagem_url) corpo.imagem_url=imagem_url;
+    const id=$('pid').value;
+    let r;
+    if(id){
+      r=await fetch(SB.url+'/rest/v1/padoq_produtos?id=eq.'+id,{method:'PATCH',
+        headers:{...H(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(corpo)});
+    }else{
+      corpo.ordem=999;
+      r=await fetch(SB.url+'/rest/v1/padoq_produtos',{method:'POST',
+        headers:{...H(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(corpo)});
+    }
+    if(!r.ok){const t=await r.text();throw new Error(t||'Erro ao salvar');}
+    aviso($('avisoForm'),'Produto salvo! ✅','ok');
+    limpar(); carregar();
+  }catch(e){aviso($('avisoForm'),e.message,'erro');}
+  $('btnSalvar').textContent='Salvar produto';
+};
+
+function limpar(){
+  $('pid').value='';$('f_nome').value='';$('f_descricao').value='';$('f_peso').value='';
+  $('f_caracteristicas').value='';$('f_foto').value='';$('f_publicado').checked=true;
+  $('fotoPrev').style.display='none';$('formTitulo').textContent='Novo produto';
+}
+$('btnLimpar').onclick=limpar;
+
+/* ---- LISTA ---- */
+async function carregar(){
+  try{
+    const r=await fetch(SB.url+'/rest/v1/padoq_produtos?select=*&order=ordem.asc,nome.asc',{headers:H()});
+    if(r.status===401){sessionStorage.removeItem('padoq_tok');location.reload();return;}
+    const rows=await r.json();
+    $('qtd').textContent=rows.length;
+    if(!rows.length){$('lista').innerHTML='<p class="mut">Nenhum produto ainda. Cadastre o primeiro acima. 👆</p>';return;}
+    $('lista').innerHTML=rows.map(p=>`
+      <div class="lista-item">
+        ${p.imagem_url?`<img src="${p.imagem_url}" alt="">`:'<img alt="">'}
+        <div class="info">
+          <b>${esc(p.nome)}</b>
+          <small>${esc(p.categoria||'')} ${p.peso?'· '+esc(p.peso):''}</small><br>
+          <span class="tag ${p.publicado?'':'off'}">${p.publicado?'Publicado':'Oculto'}</span>
+        </div>
+        <div class="acoes">
+          <button class="ic" onclick="editar(${p.id})">✏️</button>
+          <button class="ic del" onclick="excluir(${p.id},'${esc(p.nome).replace(/'/g,"")}')">🗑️</button>
+        </div>
+      </div>`).join('');
+    window._prods=rows;
+  }catch(e){$('lista').innerHTML='<p class="mut">Erro ao carregar.</p>';}
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+window.editar=id=>{
+  const p=(window._prods||[]).find(x=>x.id===id);if(!p)return;
+  $('pid').value=p.id;$('f_nome').value=p.nome||'';$('f_categoria').value=p.categoria||'Salgados Assados';
+  $('f_descricao').value=p.descricao||'';$('f_peso').value=p.peso||'';
+  $('f_caracteristicas').value=p.caracteristicas||'';$('f_publicado').checked=!!p.publicado;
+  $('f_foto').value='';
+  if(p.imagem_url){$('fotoPrev').src=p.imagem_url;$('fotoPrev').style.display='block';}else{$('fotoPrev').style.display='none';}
+  $('formTitulo').textContent='Editar: '+p.nome;
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+
+window.excluir=async(id,nome)=>{
+  if(!confirm('Excluir "'+nome+'"? Essa ação não pode ser desfeita.'))return;
+  try{
+    const r=await fetch(SB.url+'/rest/v1/padoq_produtos?id=eq.'+id,{method:'DELETE',headers:H()});
+    if(!r.ok)throw new Error();
+    carregar();
+  }catch(e){alert('Erro ao excluir.');}
+};
+
+/* auto-login se já tem token */
+if(TOKEN) entrar();
+</script>
+</body>
+</html>
